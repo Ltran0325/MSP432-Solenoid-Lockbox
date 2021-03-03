@@ -299,7 +299,7 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
             }break;
         }
 
-
+        // Wait for lock key to be pressed, lock if password successful.
         case NORMAL:
         {
             // Entering NORMAL state:
