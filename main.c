@@ -3,15 +3,15 @@
 *                                                                              *
 * Author:  Long Tran                                                           *
 * Device:  MSP432P401R LaunchPad                                               *
-* Program: Display input to keypad                                             *
+* Program: Use keypad to operate lockbox.                                      *
 *                                                                              *
 * Important Ports:                                                             *
-* P4 is OUTPUT for 7-seg display digit pattern                                 *
-* P8 is OUTPUT to control active digits in row                                 *
-* P9 is INPUT from keypad column                                               *
+* P4 is OUTPUT for 7-seg display digit pattern.                                *
+* P8 is OUTPUT to control active digits in row.                                *
+* P9 is INPUT from keypad column.                                              *
 *                                                                              *
-* P2 is OUTPUT to lock solenoid                                                *
-* P5 is OUTPUT to red LED (on during lock mode                                 *
+* P2 is OUTPUT to lock solenoid.                                               *
+* P5 is OUTPUT to red LED (on during lock mode).                               *
 *                                                                              *
 * Demo: https://www.youtube.com/watch?v=A81OljZHvpA&feature=youtu.be           *
 *******************************************************************************/
