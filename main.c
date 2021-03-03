@@ -123,14 +123,13 @@ void keypad_fsm(Keypad *key){
     P4->OUT = 0xFF;                                  // blank display
     P8->OUT = 0xFF & ~(BIT5 >> key->k);              // enable k-th display
     P4->OUT = digit_array[key->display[key->k]];     // display k-th char in array
-    wait(100);
+    wait(100);                                       // reduce display flickering
 
     // Scan for keypad input in row-k if keypad is not frozen
     if(!keypad_freeze_flag)
     {
         temp = (P9->IN) & 0x0F;             // scan input at row-k
-        if(temp > 0 )                       // if key press detected,
-        {
+        if(temp > 0 ){                      // if key press detected,
             key->x = temp;                  // acknowledge input x position
             key->y = key->k;                // acknowledge input y position
         }
@@ -198,7 +197,6 @@ void keypad_fsm(Keypad *key){
             key->display_count++;
             key->state = RELEASE;
             if(key->display_count > 3){key->display_count = 0;}
-
             break;
         }
 
