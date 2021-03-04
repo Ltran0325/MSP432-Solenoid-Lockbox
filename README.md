@@ -16,11 +16,6 @@ MSP432P401R LaunchPad: https://www.digikey.com/en/products/detail/texas-instrume
 
 red LED (solenoid): https://www.amazon.com/100pcs-Ultra-Bright-Emitting-Diffused/dp/B01GE4WHK6/ref=sr_1_5?dchild=1&keywords=red+led&qid=1614890774&sr=8-5
 
-**Keys:** 
-
-A - Open Key
-
-B - Lock Key
 
 **Demo:** 
 
