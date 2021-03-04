@@ -3,21 +3,22 @@
 *                                                                              *
 * Author:  Long Tran                                                           *
 * Device:  MSP432P401R LaunchPad                                               *
-* Program: Use keypad to operate lockbox.                                      *
+* Program: Display input to keypad                                             *
 *                                                                              *
 * Important Ports:                                                             *
-* P4 is OUTPUT for 7-seg display digit pattern.                                *
-* P8 is OUTPUT to control active digits in row.                                *
-* P9 is INPUT from keypad column.                                              *
+* P4 is OUTPUT for 7-seg display digit pattern                                 *
+* P8 is OUTPUT to control active digits in row                                 *
+* P9 is INPUT from keypad column                                               *
 *                                                                              *
-* P2 is OUTPUT to lock solenoid.                                               *
-* P5 is OUTPUT to red LED (on during lock mode).                               *
+* P2 is OUTPUT to lock solenoid                                                *
+* P5 is OUTPUT to red LED (on during lock mode                                 *
 *                                                                              *
-* Demo: https://www.youtube.com/watch?v=A81OljZHvpA                            *
+* Demo: https://www.youtube.com/watch?v=A81OljZHvpA&feature=youtu.be           *
 *******************************************************************************/
 
 // Include header file(s) and define constants
 #include "msp.h"
+#include <stdbool.h>
 #define N 100                   // debounce loop count
 #define BLANK 16                // digit-bit index to clear display
 #define OPEN_KEY 10             // open key is 'A' key
@@ -25,10 +26,10 @@
 #define FIVE_SEC 12000          // 5sec delay
 
 // Lockbox password
-const int password[] = {1, 2, 3, 4};
+const uint8_t password[] = {1, 2, 3, 4};
 
 // Define digit-bit lookup table
-const int digit_array[17] = {
+const uint8_t digit_array[17] = {
 0b11000000,  // 0
 0b11111001,  // 1
 0b10100100,  // 2
@@ -49,7 +50,7 @@ const int digit_array[17] = {
 };
 
 // Define 4x4 keypad layout
-const int keypad_table[4][9] = {
+const uint8_t keypad_table[4][9] = {
     {BLANK, OPEN_KEY,  3, BLANK, 2, BLANK, BLANK, BLANK,  1},     // 4x9 multiplixer keypad
     {BLANK, LOCK_KEY,  6, BLANK, 5, BLANK, BLANK, BLANK,  4},     // only columns 1, 2, 4, 8 are valid for single keypres
     {BLANK,       12,  9, BLANK, 8, BLANK, BLANK, BLANK,  7},     // A is open key
@@ -59,12 +60,13 @@ const int keypad_table[4][9] = {
 typedef struct{
 
     enum {IDLE, PRESS, PROCESS, RELEASE} state; // keypad state variable
-    int x;              // x position of pressed key
-    int y;              // y position of pressed key
-    int display[4];     // array for keeping the last four pressed numbers
-    int display_count;  // display array index
-    int pulses;         // debouncing pulses
-    int k;              // points to active row of keypad
+    uint8_t x;              // x position of pressed key
+    uint8_t y;              // y position of pressed key
+    uint8_t display[4];     // array for keeping the last four pressed numbers
+    uint8_t display_count;  // display array index
+    uint8_t k;              // points to active row of keypad
+    uint32_t pulses;        // debouncing pulses
+
 
 } Keypad;
 
@@ -72,29 +74,29 @@ typedef struct{
 typedef struct{
 
     enum {LOCK, SOLENOID, DOWN, NORMAL, PRELOCK} state; // lockbox state variable
-    const int *pass_code;   // passcode array to lock or open lockbox
-    int wait;               // wait counter
-    int cnt;                // password attempts
+    const uint8_t *pass_code;     // passcode array to lock or open lockbox
+    uint32_t wait;               // wait counter
+    uint32_t cnt;                // password attempts
 
 } Lockbox;
 
 // Define prototypes
 void keypad_fsm(Keypad *key);
 void lockbox_fsm(Keypad *key, Lockbox *lock);
-int  pw_check(int *arr);
-void set_display(int *arr, int digit0, int digit1, int digit2, int digit3);
+bool  pw_check(uint8_t *arr);
+void set_display(uint8_t *arr, uint8_t digit0, uint8_t digit1, uint8_t digit2, uint8_t digit3);
 void gpio_init(void);
 void solenoid_off(void);
 void solenoid_on(void);
 void redLED_off(void);
 void redLED_on(void);
 void redLED_toggle(void);
-void wait(int t);
+void wait(uint32_t t);
 
 // Define flags
-int open_flag = 0;
-int lock_flag = 0;
-int keypad_freeze_flag = 0;
+bool open_flag = 0;
+bool lock_flag = 0;
+bool keypad_freeze_flag = 0;
 
 void main(void)
 {
@@ -123,13 +125,14 @@ void keypad_fsm(Keypad *key){
     P4->OUT = 0xFF;                                  // blank display
     P8->OUT = 0xFF & ~(BIT5 >> key->k);              // enable k-th display
     P4->OUT = digit_array[key->display[key->k]];     // display k-th char in array
-    wait(100);                                       // reduce display flickering
+    wait(100);
 
     // Scan for keypad input in row-k if keypad is not frozen
     if(!keypad_freeze_flag)
     {
         temp = (P9->IN) & 0x0F;             // scan input at row-k
-        if(temp > 0 ){                      // if key press detected,
+        if(temp > 0 )                       // if key press detected,
+        {
             key->x = temp;                  // acknowledge input x position
             key->y = key->k;                // acknowledge input y position
         }
@@ -197,6 +200,7 @@ void keypad_fsm(Keypad *key){
             key->display_count++;
             key->state = RELEASE;
             if(key->display_count > 3){key->display_count = 0;}
+
             break;
         }
 
@@ -292,18 +296,18 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
                 lock->wait = 0;
                 lock->state = LOCK;
                 keypad_freeze_flag = 0;
-                set_display(key->display, 0, 0, 0, 0); // "0000"
                 break;
             }else{
                 lock->wait++;
             }break;
         }
 
-        // Wait for lock key to be pressed, lock if password successful.
+
         case NORMAL:
         {
             // Entering NORMAL state:
             if(lock->wait == 0){
+                key->display_count = 0;
                 set_display(key->display, 0, 0, 0, 0); // "0000"
             }
 
@@ -311,6 +315,8 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
             if(open_flag){
                 open_flag = 0;
                 lock->wait = 0;
+                key->display_count = 0;
+                set_display(key->display, 0, 0, 0, 0); // "0000"
                 lock->state = SOLENOID;
                 break;
             }
@@ -338,6 +344,8 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
 
             if(key->display_count){       // if input detected, return to NORMAL state
                 lock->wait = 0;
+                key->display_count = 0;
+                set_display(key->display, 0, 0, 0, 0); // "0000"
                 lock->state = NORMAL;
                 redLED_off();
             }
@@ -352,7 +360,7 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
 }
 
 // Compare user input to password
-int pw_check(int *arr){
+bool pw_check(uint8_t *arr){
     int i = 0;
     while(i < 4){
         if(*(arr+i) != password[i]){return 0;}
@@ -362,7 +370,7 @@ int pw_check(int *arr){
 }
 
 // Set display array
-void set_display(int *arr, int digit0, int digit1, int digit2, int digit3){
+void set_display(uint8_t *arr, uint8_t digit0, uint8_t digit1, uint8_t digit2, uint8_t digit3){
     *(arr)    = digit0;
     *(arr+1)  = digit1;
     *(arr+2)  = digit2;
@@ -399,6 +407,6 @@ void solenoid_off(void){
     P2->OUT |= BIT5;
 }
 
-void wait(int t){
-    while(t >= 0){t--;}     // Busy wait
+void wait(uint32_t t){
+    while(t != 0){t--;}     // Busy wait
 }
