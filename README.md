@@ -30,7 +30,7 @@ https://www.youtube.com/watch?v=A81OljZHvpA
 
 **Criteria:**
 
-- Successfully unlock your lock box (by turning ON the LED connects to P2.5) after you input the correct passcode and pressed the OPEN key .
+- Successfully unlock your lock box (by turning ON the LED connects to P2.5) after you input the correct passcode and pressed the OPEN key.
 - Successfully lock your lock box (by turning on the LED at P2.5 & blink the LED at P5.0) after you input the correct passcode again and press the LOCK key
 - You input a wrong passcode 5 times (LED does not turn on), and get locked for ~1 minute with '-Ld-' show on your display. 
 - Then you input a correct passcode during the locked-    down -period but the box does not open (LED at P2.5 does not turn on).
