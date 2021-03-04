@@ -83,7 +83,7 @@ typedef struct{
 // Define prototypes
 void keypad_fsm(Keypad *key);
 void lockbox_fsm(Keypad *key, Lockbox *lock);
-bool  pw_check(uint8_t *arr);
+bool pw_check(uint8_t *arr);
 void set_display(uint8_t *arr, uint8_t digit0, uint8_t digit1, uint8_t digit2, uint8_t digit3);
 void gpio_init(void);
 void solenoid_off(void);
