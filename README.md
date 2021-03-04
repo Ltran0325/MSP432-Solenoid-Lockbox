@@ -1,6 +1,10 @@
 # MSP432-Solenoid-Lockbox
 
-To display 4 unique digits from keypad input on a 7-segment display row using MSP432 LaunchPad. The keypad is wired in a 4x4 matrix formation to minimize used pins. Each key on the keypad contains a mechanical switch that will be debounced using a finite-state machine. https://github.com/Ltran0325/MSP432-Keypad/blob/main/main.c
+To use keypad input to operate a solenoid lockbox. 
+This project is a continuation of MSP432-Keypad:
+https://github.com/Ltran0325/MSP432-Keypad/blob/main/main.c 
+
+
 
 **Hardware:**
 
@@ -15,6 +19,7 @@ red LED (solenoid): https://www.amazon.com/100pcs-Ultra-Bright-Emitting-Diffused
 **Keys:** 
 
 A - Open Key
+
 B - Lock Key
 
 **Demo:** 
@@ -24,14 +29,11 @@ https://www.youtube.com/watch?v=A81OljZHvpA
 **Criteria:**
 
 - Successfully unlock your lock box (by turning ON the LED connects to P2.5) after you input the correct passcode and pressed the OPEN key .
-
 - Successfully lock your lock box (by turning on the LED at P2.5 & blink the LED at P5.0) after you input the correct passcode again and press the LOCK key
-
-- You input a wrong passcode 5 times (LED does not turn on), and get locked for ~1 minute with '-Ld-' show on your display. Then you input a correct passcode during the locked-    down -period but the box does not open (LED at P2.5 does not turn on).
-
--The 7-segment display should show the passcode you entered every time, whether is correct or not.
-
--The 7-segment display should show the corresponding characters '-Ld-' & '-LOC' at lock & lockdown state.
+- You input a wrong passcode 5 times (LED does not turn on), and get locked for ~1 minute with '-Ld-' show on your display. 
+- Then you input a correct passcode during the locked-    down -period but the box does not open (LED at P2.5 does not turn on).
+- The 7-segment display should show the passcode you entered every time, whether is correct or not.
+- The 7-segment display should show the corresponding characters '-Ld-' & '-LOC' at lock & lockdown state.
 
 **Lockbox Flowchart:**
 ![image](https://user-images.githubusercontent.com/62213019/110027542-f5050000-7ce6-11eb-9001-580a07f68d1e.png)
