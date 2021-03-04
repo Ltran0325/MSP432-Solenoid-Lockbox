@@ -1,8 +1,7 @@
 # MSP432-Solenoid-Lockbox
 
-To use keypad input to operate a solenoid lockbox. 
-This project is a continuation of MSP432-Keypad:
-https://github.com/Ltran0325/MSP432-Keypad/blob/main/main.c 
+To use keypad input to operate a solenoid lockbox:
+https://github.com/Ltran0325/MSP432-Solenoid-Lockbox/blob/main/main.c
 
 
 
