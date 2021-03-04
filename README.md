@@ -6,6 +6,8 @@ https://github.com/Ltran0325/MSP432-Solenoid-Lockbox/blob/main/main.c
 
 
 
+
+
 **Hardware:**
 
 MSP432P401R LaunchPad: https://www.digikey.com/en/products/detail/texas-instruments/MSP-EXP432P401R/5170609
@@ -17,9 +19,14 @@ MSP432P401R LaunchPad: https://www.digikey.com/en/products/detail/texas-instrume
 red LED (solenoid): https://www.amazon.com/100pcs-Ultra-Bright-Emitting-Diffused/dp/B01GE4WHK6/ref=sr_1_5?dchild=1&keywords=red+led&qid=1614890774&sr=8-5
 
 
+
+
 **Demo:** 
 
 https://www.youtube.com/watch?v=A81OljZHvpA
+
+
+
 
 **Criteria:**
 
@@ -29,6 +36,8 @@ https://www.youtube.com/watch?v=A81OljZHvpA
 - Then you input a correct passcode during the locked-    down -period but the box does not open (LED at P2.5 does not turn on).
 - The 7-segment display should show the passcode you entered every time, whether is correct or not.
 - The 7-segment display should show the corresponding characters '-Ld-' & '-LOC' at lock & lockdown state.
+
+
 
 **Lockbox Flowchart:**
 ![image](https://user-images.githubusercontent.com/62213019/110027542-f5050000-7ce6-11eb-9001-580a07f68d1e.png)
