@@ -25,9 +25,6 @@
 #define LOCK_KEY 11             // lock key is 'B' key
 #define FIVE_SEC 12000          // 5sec delay
 
-// Lockbox password
-const uint8_t password[] = {1, 2, 3, 4};
-
 // Define digit-bit lookup table
 const uint8_t digit_array[17] = {
 0b11000000,  // 0
@@ -66,15 +63,13 @@ typedef struct{
     uint8_t display_count;  // display array index
     uint8_t k;              // points to active row of keypad
     uint32_t pulses;        // debouncing pulses
-
-
+    
 } Keypad;
 
 // Define lockbox structure
 typedef struct{
 
     enum {LOCK, SOLENOID, DOWN, NORMAL, PRELOCK} state; // lockbox state variable
-    const uint8_t *pass_code;     // passcode array to lock or open lockbox
     uint32_t wait;               // wait counter
     uint32_t cnt;                // password attempts
 
@@ -85,6 +80,7 @@ void keypad_fsm(Keypad *key);
 void lockbox_fsm(Keypad *key, Lockbox *lock);
 bool pw_check(uint8_t *arr);
 void set_display(uint8_t *arr, uint8_t digit0, uint8_t digit1, uint8_t digit2, uint8_t digit3);
+void set_password(uint8_t *arr);
 void gpio_init(void);
 void solenoid_off(void);
 void solenoid_on(void);
@@ -97,6 +93,7 @@ void wait(uint32_t t);
 bool open_flag = 0;
 bool lock_flag = 0;
 bool keypad_freeze_flag = 0;
+uint8_t lock_pass[4] = {1,2,3,4};   // lock password
 
 void main(void)
 {
@@ -106,7 +103,7 @@ void main(void)
 
     // Initialize structure instances
     Keypad key = {IDLE, 0, 0, {15,14,0,12}, 0, 0, 0 };
-    Lockbox lock = {LOCK, password, 0, 0};
+    Lockbox lock = {LOCK, 0, 0};
 
     while(1)
     {
@@ -237,16 +234,15 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
         {
             // Entering LOCK state:
             if(lock->wait == 0){
-                redLED_on();
-                set_display(key->display, 15, 14, 0, 12); // display "_LOC"
-                lock->wait++;
+            redLED_on();
+            set_display(key->display, 15, 14, 0, 12); // display "_LOC"
+            lock->wait++;
             }
 
             // Test input if open key pressed
             if(open_flag){
                 open_flag = 0;
                 lock->wait = 0;
-                key->display_count = 0;
                 if(pw_check(key->display)){
                     lock->cnt = 0;
                     lock->state = SOLENOID;     // password success
@@ -254,9 +250,9 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
                     break;
                 }else{                          // if password wrong, increment cnt
                     lock->cnt += 1;
-                    if(lock->cnt >= 5){         // if wrong 5 times, enter lockdown state
+                    if(lock->cnt >= 5){
                         lock->cnt = 0;
-                        lock->state = DOWN;
+                        lock->state = DOWN;     // if wrong 5 times, enter lockdown state
                         redLED_off();
                     }
                 }
@@ -267,39 +263,33 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
         case SOLENOID:
         {
             // Entering SOLENOID state:
-            if(lock->wait == 0){
                 solenoid_on();
-            }
+                lock->wait++;
 
             // Return to NORMAL state after 5s
             if(lock->wait > FIVE_SEC){
                 lock->wait = 0;
                 lock->state = NORMAL;
                 solenoid_off();
-                break;
-            }else{
-                lock->wait++;
             }break;
+
         }
 
         // Freeze keypad for 1 minute, then return to LOCK state
         case DOWN:
         {
             // Entering DOWN state:
-            if(lock->wait == 0){
-                set_display(key->display, 15, 14, 13, 15); // Display "_Ld_"
-                keypad_freeze_flag = 1;                    // freeze keypad (no input)
-            }
+            set_display(key->display, 15, 14, 13, 15); // Display "_Ld_"
+            keypad_freeze_flag = 1;                    // freeze keypad (no input)
+            lock->wait++;
 
             // Return to LOCK state after 1 minute
             if(lock->wait > FIVE_SEC*3){
                 lock->wait = 0;
                 lock->state = LOCK;
                 keypad_freeze_flag = 0;
-                break;
-            }else{
-                lock->wait++;
             }break;
+
         }
 
 
@@ -307,32 +297,25 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
         {
             // Entering NORMAL state:
             if(lock->wait == 0){
-                key->display_count = 0;
                 set_display(key->display, 0, 0, 0, 0); // "0000"
+                lock->wait++;
             }
 
             // Re-energize lock solenoid if open key is pressed
             if(open_flag){
                 open_flag = 0;
                 lock->wait = 0;
-                key->display_count = 0;
-                set_display(key->display, 0, 0, 0, 0); // "0000"
                 lock->state = SOLENOID;
-                break;
             }
 
-            // Go to PRELOCK state if password successful and lock key is pressed
+            // Go to PRELOCK state and set new user password
             if(lock_flag){
                 lock_flag = 0;
                 lock->wait = 0;
-                key->display_count = 0;
-                if(pw_check(key->display)){         // if password success
-                    lock->state = PRELOCK;
-                    break;
-                }
-            }
-            lock->wait++;
-            break;
+                set_password(key->display);
+                lock->state = PRELOCK;
+            }break;
+
         }
 
         // 5 second period before LOCK state. Blink red LED. Allow user option to return to normal state with locking.
@@ -341,32 +324,39 @@ void lockbox_fsm(Keypad *key, Lockbox *lock){
             if(lock->wait%1000 == 0){     //  Blink LED every 1000 loops
                 redLED_toggle();
             }
+            lock->wait++;
 
             if(key->display_count){       // if input detected, return to NORMAL state
                 lock->wait = 0;
                 key->display_count = 0;
-                set_display(key->display, 0, 0, 0, 0); // "0000"
                 lock->state = NORMAL;
                 redLED_off();
             }
 
-            lock->wait++;
             if(lock->wait == FIVE_SEC){   // if no input detected in 5s, lock the safe
                 lock->wait = 0;
                 lock->state = LOCK;
             }break;
+
         }
     }
 }
 
 // Compare user input to password
-bool pw_check(uint8_t *arr){
+bool pw_check(uint8_t *arr ){
     int i = 0;
     while(i < 4){
-        if(*(arr+i) != password[i]){return 0;}
+        if(arr[i] != lock_pass[i]){return 0;}
         i++;
     }
     return 1;
+}
+
+void set_password(uint8_t *arr){
+    lock_pass[0] = *(arr);
+    lock_pass[1] = *(arr+1);
+    lock_pass[2] = *(arr+2);
+    lock_pass[3] = *(arr+3);
 }
 
 // Set display array
