@@ -13,7 +13,7 @@
 * P2 is OUTPUT to lock solenoid                                                *
 * P5 is OUTPUT to red LED (on during lock mode                                 *
 *                                                                              *
-* Demo: https://www.youtube.com/watch?v=A81OljZHvpA&feature=youtu.be           *
+* Demo: https://www.youtube.com/watch?v=xvXOEY5Ds3I                            *
 *******************************************************************************/
 
 // Include header file(s) and define constants
