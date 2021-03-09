@@ -29,4 +29,4 @@ https://youtu.be/xvXOEY5Ds3I
 - The 7-segment display should show the corresponding characters '-Ld-' & '-LOC' at lock & lock-down state.
 
 **Lockbox State Transition Table:**
-![image](https://user-images.githubusercontent.com/62213019/110407335-869ea580-8038-11eb-9e1d-00f1e5aeeb2c.png)
+![image](https://user-images.githubusercontent.com/62213019/110407677-1fcdbc00-8039-11eb-90e3-cc142ea5bc02.png)
