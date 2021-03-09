@@ -17,7 +17,7 @@ red LED (solenoid): https://www.amazon.com/100pcs-Ultra-Bright-Emitting-Diffused
 
 **Demo:** 
 
-https://www.youtube.com/watch?v=A81OljZHvpA
+https://youtu.be/xvXOEY5Ds3I
 
 **Criteria:**
 
