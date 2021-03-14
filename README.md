@@ -22,7 +22,7 @@ https://youtu.be/xvXOEY5Ds3I
 **Criteria:**
 
 - Successfully unlock your lockbox (by turning ON the LED connects to P2.5) after you input the correct passcode and press the OPEN key.
-- Successfully lock your lockbox (by turning on the LED at P2.5 & blink the LED at P5.0) after you input the correct passcode again and press the LOCK key
+- Successfully lock your lockbox (by turning on the LED at P2.5 & blink the LED at P5.0) after you input new passcode and press the LOCK key
 - You input a wrong passcode 5 times (LED does not turn on), and get locked for ~1 minute with '-Ld-' show on your display. 
 - Then you input a correct passcode during the lock-down period but the box does not open (LED at P2.5 does not turn on).
 - The 7-segment display should show the passcode you entered every time, whether is correct or not.
