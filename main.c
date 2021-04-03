@@ -14,6 +14,7 @@
 * P5 is OUTPUT to red LED (on during lock mode                                 *
 *                                                                              *
 * Demo: https://www.youtube.com/watch?v=xvXOEY5Ds3I                            *
+* GitHub: https://github.com/Ltran0325                                         *
 *******************************************************************************/
 
 // Include header file(s) and define constants
